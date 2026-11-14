@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { downloadEntries, listEntries, moduleMeta, runAction as applyAction } from '@/api/local-service'
 import type { EntryRow } from '@/data/types'
+import ProfileVersionPanel from './ProfileVersionPanel'
 
 const meta = moduleMeta('profile')
 const columns = [
@@ -45,6 +46,7 @@ export default function ProfileView() {
   const [total, setTotal] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
   const [filters, setFilters] = useState<Record<string, string>>({})
+  const [tick, setTick] = useState(0)
   const filterFields = useMemo(() => columns.slice(0, 3), [])
 
   const reload = useCallback(() => {
@@ -69,6 +71,7 @@ export default function ProfileView() {
       setErrorMessage(result.message)
       return
     }
+    setTick((value) => value + 1)
     reload()
   }
 
@@ -88,6 +91,8 @@ export default function ProfileView() {
           </button>
         </div>
       </header>
+
+      <ProfileVersionPanel tick={tick} />
 
       <div className="stat-row">
         {stats.map((item) => (

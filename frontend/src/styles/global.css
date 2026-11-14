@@ -33,5 +33,36 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .link { border: none; background: none; color: var(--brand); cursor: pointer; padding: 0; }
 .page-foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .error-text { color: #b42318; }
+.success-text { color: #047857; }
 .status-legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 10px; font-size: 12px; color: var(--muted); }
 .legend-item { background: #eef2f7; border-radius: 999px; padding: 2px 10px; }
+
+/* 画像版本 / 留存快照领域面板 */
+.domain-panel { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin: 12px 0 18px; }
+.domain-panel h3 { margin: 0 0 4px; font-size: 15px; }
+.domain-panel .panel-note { margin: 0 0 12px; font-size: 12px; color: var(--muted); }
+.version-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.version-card { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: #fbfcfe; display: flex; flex-direction: column; gap: 6px; }
+.version-card.current { border-color: var(--brand); box-shadow: 0 0 0 1px var(--brand) inset; }
+.version-head { display: flex; justify-content: space-between; align-items: center; }
+.version-head strong { font-size: 14px; }
+.badge { font-size: 11px; border-radius: 999px; padding: 2px 8px; background: #eef2f7; color: var(--muted); }
+.badge.current { background: var(--brand); color: #fff; }
+.badge.pending { background: #fef3c7; color: #92400e; }
+.kv { display: grid; grid-template-columns: 84px 1fr; gap: 4px 8px; font-size: 12px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; word-break: break-word; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 11px; background: #eef2f7; border-radius: 999px; padding: 2px 8px; color: #334155; }
+.chip.affected { background: #fee2e2; color: #b42318; }
+.layer-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 6px; }
+.layer-table th, .layer-table td { border: 1px solid var(--border); padding: 5px 8px; text-align: left; }
+.job-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; background: #fffbeb; border: 1px solid #f59e0b; border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; font-size: 12px; }
+.snapshot-block { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; background: #fbfcfe; }
+.snapshot-block.superseded { opacity: 0.72; background: #f8fafc; }
+.snapshot-head { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+.plan-card { border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: #fff; }
+.plan-card h4 { margin: 0 0 8px; font-size: 14px; }
+.inline-note { font-size: 12px; color: var(--muted); margin: 4px 0 0; }
+.btn.small { padding: 3px 10px; font-size: 12px; }

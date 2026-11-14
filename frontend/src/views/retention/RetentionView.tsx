@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { downloadEntries, listEntries, moduleMeta, runAction as applyAction } from '@/api/local-service'
+import { pendingJobs } from '@/data/retention-domain'
 import type { EntryRow } from '@/data/types'
+import RetentionPlanPanel from './RetentionPlanPanel'
 
 const meta = moduleMeta('retention')
 const columns = [
@@ -12,7 +14,9 @@ const columns = [
   "观察天数",
   "群组粒度",
   "留存阈值",
-  "关联产品"
+  "关联产品",
+  "关联画像",
+  "固定画像版本"
 ]
 const actions = [
   "提交方案评审",
@@ -25,27 +29,25 @@ const statuses = [
   "已启用",
   "已归档"
 ]
-const stats = [
-  {
-    "label": "留存方案总数",
-    "value": 0
-  },
-  {
-    "label": "已启用方案",
-    "value": 0
-  },
-  {
-    "label": "方案评审中",
-    "value": 0
-  }
-]
 
 export default function RetentionView() {
   const [rows, setRows] = useState<EntryRow[]>([])
   const [total, setTotal] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
   const [filters, setFilters] = useState<Record<string, string>>({})
+  const [tick, setTick] = useState(0)
+  const [successMessage, setSuccessMessage] = useState('')
   const filterFields = useMemo(() => columns.slice(0, 3), [])
+
+  const stats = useMemo(
+    () => [
+      { label: '留存方案总数', value: rows.length },
+      { label: '已启用方案', value: rows.filter((row) => String(row.status) === '已启用').length },
+      // tick 变化时同步待重算数量
+      { label: '待重算任务', value: pendingJobs().length },
+    ],
+    [rows, tick],
+  )
 
   const reload = useCallback(() => {
     setErrorMessage('')
@@ -64,11 +66,21 @@ export default function RetentionView() {
 
   function runAction(action: string, row: EntryRow) {
     setErrorMessage('')
+    setSuccessMessage('')
     const result = applyAction(meta.key, Number(row.id), action)
     if (!result.ok) {
       setErrorMessage(result.message)
       return
     }
+    setSuccessMessage(result.message)
+    setTick((value) => value + 1)
+    reload()
+  }
+
+  function handlePanelMessage(message: string, ok: boolean) {
+    setErrorMessage(ok ? '' : message)
+    setSuccessMessage(ok ? message : '')
+    setTick((value) => value + 1)
     reload()
   }
 
@@ -88,6 +100,8 @@ export default function RetentionView() {
           </button>
         </div>
       </header>
+
+      <RetentionPlanPanel tick={tick} onRecomputed={handlePanelMessage} />
 
       <div className="stat-row">
         {stats.map((item) => (
@@ -153,6 +167,7 @@ export default function RetentionView() {
 
       <footer className="page-foot">
         <span>共 {total} 条留存分析记录</span>
+        {successMessage && <span className="success-text">{successMessage}</span>}
         {errorMessage && <span className="error-text">{errorMessage}</span>}
       </footer>
     </section>

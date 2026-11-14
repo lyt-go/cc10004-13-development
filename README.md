@@ -70,5 +70,29 @@ npm run build
 - 状态流转只允许在 `local-service.ts` 里改，页面组件不做业务判断。
 - 想回到初始数据：清掉浏览器里 `data-product-ops:entries` 这一项，或调用 `resetModule(模块)`。
 
+## 画像版本驱动的留存重算
+
+`frontend/src/data/retention-domain.ts` 在通用 CRUD 之外实现了一条独立的领域链路：
+
+- **启用固定**：留存方案启用时固定初始事件、画像版本与分层区间，产出首个留存快照
+  （各层留存率 + 覆盖用户量），初始事件之后不再被画像换版改写。
+- **版本发布**：画像发布新版本时，只给引用该画像的「已启用」方案投递待重算任务；
+  未引用该画像的方案（如 RETE-0001 绑定 PROF-0001）完全不受影响。
+- **局部重算**：重算只重算口径指纹变化的分层（补算窗口 14 天），未受影响分层沿用上一版
+  留存率；旧快照 append-only 保留，标记为「历史对照」。
+- **单次提交**：换版/启用/重算都先在内存完成全部计算，再一次性写入领域状态与业务表，
+  任一环节失败整体回滚，不会出现「画像已换版、覆盖率仍是旧值」的半成品。
+- **新版为准**：同一方案排队多个版本时只保留最高版本任务；重算守卫拒绝任何低于当前
+  快照版本的旧结果覆盖新分层人群。
+
+领域状态持久化在 localStorage 的 `data-product-ops:retention-domain` 键下。
+逻辑验证脚本：`frontend/verify-retention.ts`（不参与前端构建），运行方式：
+
+```bash
+cd frontend
+node_modules/.bin/esbuild verify-retention.ts --bundle --platform=node --format=esm \
+  --outfile=/tmp/verify-retention.mjs && node /tmp/verify-retention.mjs
+```
+
 领域：数据工程
 子方向：数据分析与数据应用
